@@ -12,7 +12,6 @@ const SelectWrapper = ({ heading, name, options, handleChange, selectValue }) =>
       placeholder="Wybierz..."
       options={options}
       onChange={handleChange}
-      style={{ width: '15%', marginRight: "5%" }}
       value={selectValue}
     />
   </div>
