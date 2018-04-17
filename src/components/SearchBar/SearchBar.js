@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
-import SelectWrapper from './Select/SelectWrapper';
+import SelectWrapper from './SelectWrapper/SelectWrapper';
+import SalesRange from './SalesRange/SalesRange';
+import withHeading from '../UI/withHeading';
 
 class SearchBar extends Component {
   state = {
@@ -9,27 +10,37 @@ class SearchBar extends Component {
     activeType: null,
   };
 
-  SELECT_TYPE = Object.freeze({
-    SELECT_TYPE_COUNTRY: 'SELECT_COUNTRY',
-    SELECT_TYPE_YEAR: 'SELECT_YEAR',
-    SELECT_TYPE_SALES_RANGE: 'SELECT_SALES_RANGE',
+  INPUT_TYPE = Object.freeze({
+    INPUT_TYPE_COUNTRY: 'SELECT_COUNTRY',
+    INPUT_TYPE_YEAR: 'SELECT_YEAR',
+    INPUT_TYPE_SALES_RANGE: 'SELECT_SALES_RANGE',
   });
 
   selectChangedHandler(selectType, newValue) {
     switch (selectType) {
-      case this.SELECT_TYPE.SELECT_TYPE_COUNTRY: {
+      case this.INPUT_TYPE.INPUT_TYPE_COUNTRY: {
         this.setState({
-          activeType: this.SELECT_TYPE.SELECT_TYPE_COUNTRY,
+          activeType: this.INPUT_TYPE.INPUT_TYPE_COUNTRY,
         });
         break;
       }
-      case this.SELECT_TYPE.SELECT_TYPE_YEAR:
-        {
-          this.setState({
-            activeType: this.SELECT_TYPE.SELECT_TYPE_YEAR,
-          });
-        }
+      case this.INPUT_TYPE.INPUT_TYPE_YEAR: {
+        this.setState({
+          activeType: this.INPUT_TYPE.INPUT_TYPE_YEAR,
+        });
         break;
+      }
+      case this.INPUT_TYPE.INPUT_TYPE_SALES_RANGE: {
+        this.setState({
+          activeType: this.INPUT_TYPE.INPUT_TYPE_SALES_RANGE,
+        });
+        break;
+      }
+      default: {
+        this.setState({
+          activeType: null,
+        });
+      }
     }
 
     this.setState({
@@ -38,39 +49,54 @@ class SearchBar extends Component {
   }
 
   render() {
+    const CountrySelect = withHeading('Kraj/Region', SelectWrapper);
+    const YearSelect = withHeading('Rok', SelectWrapper);
+    const SalesRangeSlidersWithHeading = withHeading(
+      'Ilość sprzedanych aut',
+      SalesRange,
+    );
     return (
-      <div style={{ marginLeft: '10%', marginRight: '10%' }}>
-        <SelectWrapper
-          heading="Kraj/Region"
+      <div style={{ marginTop: '6%', marginLeft: '10%', marginRight: '10%' }}>
+        <CountrySelect
           name="country"
+          style={{ width: 228 }}
           options={[
             { value: 'polska', label: 'Polska' },
             { value: 'wielka-brytania', label: 'Wielka Brytania' },
           ]}
           handleChange={newValue =>
             this.selectChangedHandler(
-              this.SELECT_TYPE.SELECT_TYPE_COUNTRY,
+              this.INPUT_TYPE.INPUT_TYPE_COUNTRY,
               newValue,
             )
           }
           selectValue={
-            this.state.activeType === this.SELECT_TYPE.SELECT_TYPE_COUNTRY
-              && this.state.selectedValue
+            this.state.activeType === this.INPUT_TYPE.INPUT_TYPE_COUNTRY &&
+            this.state.selectedValue
           }
         />
-        <SelectWrapper
-          heading="Rok"
+        <YearSelect
           name="year"
           options={[{ value: 2005, label: 2005 }, { value: 2006, label: 2006 }]}
           handleChange={newValue =>
+            this.selectChangedHandler(this.INPUT_TYPE.INPUT_TYPE_YEAR, newValue)
+          }
+          selectValue={
+            this.state.activeType === this.INPUT_TYPE.INPUT_TYPE_YEAR &&
+            this.state.selectedValue
+          }
+        />
+        <SalesRangeSlidersWithHeading
+          handleChange={newValue =>
             this.selectChangedHandler(
-              this.SELECT_TYPE.SELECT_TYPE_YEAR,
+              this.INPUT_TYPE.INPUT_TYPE_SALES_RANGE,
               newValue,
             )
           }
           selectValue={
-            this.state.activeType === this.SELECT_TYPE.SELECT_TYPE_YEAR
-              && this.state.selectedValue
+            this.state.activeType === this.INPUT_TYPE.INPUT_TYPE_SALES_RANGE
+              ? this.state.selectedValue
+              : [0, 0]
           }
         />
       </div>
