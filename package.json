@@ -5,10 +5,17 @@
   "dependencies": {
     "ag-grid": "^17.1.0",
     "ag-grid-react": "^17.1.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-import-resolver-node": "^0.3.2",
+    "eslint-plugin-css-modules": "^2.7.5",
+    "eslint-plugin-prettier": "^2.6.0",
+    "prettier": "^1.11.1",
+    "prop-types": "^15.6.1",
+    "rc-slider": "^8.6.1",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
     "react-dom-factories": "^1.0.2",
-    "react-input-slider": "^4.0.1",
     "react-scripts": "1.1.4",
     "react-select": "^1.2.1"
   },
