@@ -5,7 +5,7 @@ const withHeading = (heading, Component) => {
     render() {
       return (
         <Fragment>
-          <h3>{heading}</h3>
+          <h3 style={{marginTop: 18, marginBottom: 18}}>{heading}</h3>
           <Component {...this.props} />
         </Fragment>
       );
