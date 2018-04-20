@@ -1,11 +1,17 @@
 import React, { Fragment } from 'react';
+import styled from 'styled-components';
+
+const Heading = styled.h3`
+  margin-top: 18px;
+  margin-bottom: 18px;
+`;
 
 const withHeading = (heading, Component) => {
   return class extends React.Component {
     render() {
       return (
         <Fragment>
-          <h3 style={{marginTop: 18, marginBottom: 18}}>{heading}</h3>
+          <Heading>{heading}</Heading>
           <Component {...this.props} />
         </Fragment>
       );

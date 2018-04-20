@@ -1,8 +1,18 @@
 import React, { Component } from 'react';
+import styled from "styled-components";
 
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-balham.css';
+
+const AgGridContainer = styled.div`
+  margin-top: 106px;
+  margin-right: 75px;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+`;
 
 class SalesTable extends Component {
   onGridReady = params => {
@@ -20,17 +30,7 @@ class SalesTable extends Component {
 
   render() {
     return (
-      <div
-        className="ag-theme-balham"
-        style={{
-          marginTop: 106,
-          marginRight: 75,
-          boxSizing: 'border-box',
-          height: '100%',
-          width: '100%',
-          overflow: 'hidden',
-        }}
-      >
+      <AgGridContainer className="ag-theme-balham">
         <AgGridReact
           columnDefs={this.props.columnDefs}
           rowData={this.props.rowData}
@@ -39,7 +39,7 @@ class SalesTable extends Component {
           domLayout="autoHeight"
           enableColResize
         />
-      </div>
+      </AgGridContainer>
     );
   }
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import axios from 'axios';
 
 import SearchBar from '../components/SearchBar/SearchBar';
@@ -6,6 +7,18 @@ import SalesTable from '../components/SalesTable/SalesTable';
 import DisplayButton from '../components/DisplayButton/DisplayButton';
 import { INPUT_TYPE } from '../shared/constants';
 import Header from '../components/Header/Header';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const SearchForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 75px;
+  margin-right: 75px;
+`;
 
 class App extends Component {
   constructor(props) {
@@ -122,27 +135,20 @@ class App extends Component {
     return (
       <div>
         <Header />
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginLeft: 75,
-              marginRight: 75,
-            }}
-          >
+        <Container>
+          <SearchForm>
             <SearchBar
               searchValue={this.state.searchValue}
               activeType={this.state.activeType}
               handleSelectChanged={this.handleSelectChanged}
             />
             <DisplayButton handleClick={this.handleDisplay} />
-          </div>
+          </SearchForm>
           <SalesTable
             columnDefs={this.state.columnDefs}
             rowData={this.state.rowData}
           />
-        </div>
+        </Container>
       </div>
     );
   }
