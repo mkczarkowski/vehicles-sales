@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
-const SelectWrapper = ({ heading, name, options, handleChange, selectValue }) => (
-  <div className="section">
-    <h3 className="section-heading">{heading}</h3>
+const SelectWrapper = ({ name, options, handleChange, selectValue }) => (
+  <div>
     <Select
+      style={{ width: 228 }}
       name={name}
       placeholder="Wybierz..."
       options={options}
