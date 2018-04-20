@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "ag-grid": "^17.1.0",
+    "ag-grid": "^17.1.1",
     "ag-grid-react": "^17.1.0",
+    "axios": "^0.18.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-import-resolver-node": "^0.3.2",
@@ -17,7 +18,8 @@
     "react-dom": "^16.3.1",
     "react-dom-factories": "^1.0.2",
     "react-scripts": "1.1.4",
-    "react-select": "^1.2.1"
+    "react-select": "^1.2.1",
+    "styled-components": "^3.2.6"
   },
   "scripts": {
     "start": "react-scripts start",
