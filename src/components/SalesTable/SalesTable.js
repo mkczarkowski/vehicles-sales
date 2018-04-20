@@ -5,36 +5,39 @@ import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-balham.css';
 
 class SalesTable extends Component {
-  constructor(props) {
-    super(props);
+  onGridReady = params => {
+    params.api.sizeColumnsToFit();
+    window.addEventListener('resize', function() {
+      setTimeout(function() {
+        params.api.sizeColumnsToFit();
+      });
+    });
+  };
 
-    this.state = {
-      columnDefs: [
-        { headerName: 'Kraj', field: 'make' },
-        { headerName: '2001', field: 'model' },
-        { headerName: '2002', field: 'price' },
-      ],
-      rowData: [
-        { make: 'Polska', model: 'Celica', price: 35000 },
-        { make: 'Anglia', model: 'Mondeo', price: 32000 },
-        { make: 'Niemcy', model: 'Boxter', price: 72000 },
-      ],
-    };
-  }
+  onModelUpdated = params => {
+    params.api.sizeColumnsToFit();
+  };
 
   render() {
     return (
       <div
         className="ag-theme-balham"
         style={{
-          marginTop: "3%",
-          height: '500px',
-          width: '60%',
+          marginTop: 106,
+          marginRight: 75,
+          boxSizing: 'border-box',
+          height: '100%',
+          width: '100%',
+          overflow: 'hidden',
         }}
       >
         <AgGridReact
-          columnDefs={this.state.columnDefs}
-          rowData={this.state.rowData}
+          columnDefs={this.props.columnDefs}
+          rowData={this.props.rowData}
+          onGridReady={this.onGridReady}
+          onModelUpdated={this.onModelUpdated}
+          domLayout="autoHeight"
+          enableColResize
         />
       </div>
     );
