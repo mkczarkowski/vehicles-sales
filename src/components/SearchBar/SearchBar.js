@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import SelectWrapper from './SelectWrapper/SelectWrapper';
 import SalesRange from './SalesRange/SalesRange';
@@ -9,10 +10,13 @@ class SearchBar extends Component {
   render() {
     const CountrySelect = withHeading('Kraj/Region', SelectWrapper);
     const YearSelect = withHeading('Rok', SelectWrapper);
-    const SalesRangeSlidersWithHeading = withHeading(
+    const SalesRangeWithHeading = withHeading(
       'Ilość sprzedanych aut',
       SalesRange,
     );
+
+    const { handleInputChange, activeType, searchValue } = this.props;
+
     return (
       <div style={{ marginTop: 88 }}>
         <CountrySelect
@@ -23,37 +27,27 @@ class SearchBar extends Component {
             { value: 'anglia', label: 'Anglia' },
           ]}
           handleChange={newValue =>
-            this.props.handleSelectChanged(
-              INPUT_TYPE.INPUT_TYPE_COUNTRY,
-              newValue,
-            )
+            handleInputChange(INPUT_TYPE.INPUT_TYPE_COUNTRY, newValue)
           }
-          selectValue={
-            this.props.activeType === INPUT_TYPE.INPUT_TYPE_COUNTRY &&
-            this.props.searchValue
+          searchValue={
+            activeType === INPUT_TYPE.INPUT_TYPE_COUNTRY && searchValue
           }
         />
         <YearSelect
           name="year"
           options={[{ value: 2005, label: 2005 }, { value: 2006, label: 2006 }]}
           handleChange={newValue =>
-            this.props.handleSelectChanged(INPUT_TYPE.INPUT_TYPE_YEAR, newValue)
+            handleInputChange(INPUT_TYPE.INPUT_TYPE_YEAR, newValue)
           }
-          selectValue={
-            this.props.activeType === INPUT_TYPE.INPUT_TYPE_YEAR &&
-            this.props.searchValue
-          }
+          searchValue={activeType === INPUT_TYPE.INPUT_TYPE_YEAR && searchValue}
         />
-        <SalesRangeSlidersWithHeading
+        <SalesRangeWithHeading
           handleChange={newValue =>
-            this.props.handleSelectChanged(
-              INPUT_TYPE.INPUT_TYPE_SALES_RANGE,
-              newValue,
-            )
+            handleInputChange(INPUT_TYPE.INPUT_TYPE_SALES_RANGE, newValue)
           }
-          selectValue={
-            this.props.activeType === INPUT_TYPE.INPUT_TYPE_SALES_RANGE
-              ? this.props.searchValue
+          searchValue={
+            activeType === INPUT_TYPE.INPUT_TYPE_SALES_RANGE
+              ? searchValue
               : [0, 0]
           }
         />
@@ -61,5 +55,21 @@ class SearchBar extends Component {
     );
   }
 }
+
+SearchBar.propTypes = {
+  handleInputChange: PropTypes.func.isRequired,
+  activeType: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  searchValue: PropTypes.oneOfType([
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.string,
+    }),
+    PropTypes.arrayOf([PropTypes.number, PropTypes.number]),
+  ]),
+};
+
+SearchBar.defaultProps = {
+  activeType: null,
+};
 
 export default SearchBar;

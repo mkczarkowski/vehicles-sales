@@ -7,4 +7,8 @@ const DisplayButton = ({ handleClick }) => (
   <Button onClick={handleClick}>Wyświetl</Button>
 );
 
+DisplayButton.propTypes = {
+  handleClick: PropTypes.func.isRequired,
+};
+
 export default DisplayButton;

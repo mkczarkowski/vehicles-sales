@@ -5,7 +5,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import { inputSize } from '../../../shared/constants';
 
-const SelectWrapper = ({ name, options, handleChange, selectValue }) => (
+const SelectWrapper = ({ name, options, handleChange, searchValue }) => (
   <div>
     <Select
       style={{ width: inputSize }}
@@ -13,9 +13,31 @@ const SelectWrapper = ({ name, options, handleChange, selectValue }) => (
       placeholder="Wybierz..."
       options={options}
       onChange={handleChange}
-      value={selectValue}
+      value={searchValue}
     />
   </div>
 );
+
+SelectWrapper.propTypes = {
+  name: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    }),
+  ).isRequired,
+  handleChange: PropTypes.func.isRequired,
+  searchValue: PropTypes.oneOfType([
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.string,
+    }),
+    PropTypes.bool,
+  ]),
+};
+
+SelectWrapper.defaultProps = {
+  searchValue: null,
+};
 
 export default SelectWrapper;

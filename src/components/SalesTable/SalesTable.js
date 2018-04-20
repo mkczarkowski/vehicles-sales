@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import styled from "styled-components";
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid/dist/styles/ag-grid.css';
@@ -43,5 +44,18 @@ class SalesTable extends Component {
     );
   }
 }
+
+SalesTable.propTypes = {
+  columnDefs: PropTypes.arrayOf(
+    PropTypes.shape({
+      headerName: PropTypes.string,
+      field: PropTypes.string,
+      minWidth: PropTypes.number,
+    }),
+  ).isRequired,
+  rowData: PropTypes.arrayOf(
+    PropTypes.objectOf(PropTypes.string, PropTypes.number),
+  ).isRequired,
+};
 
 export default SalesTable;

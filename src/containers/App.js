@@ -83,7 +83,7 @@ class App extends Component {
     ],
   };
 
-  handleSelectChanged = (selectType, newValue) => {
+  handleInputChange = (selectType, newValue) => {
     this.setState({
       activeType: newValue && selectType, // Determine if newValue is not null, if so, set new activeType
       searchValue: newValue,
@@ -109,7 +109,8 @@ class App extends Component {
       case INPUT_TYPE.INPUT_TYPE_YEAR: {
         const matchColumns = col => {
           const isCountryField = col.field === 'country'; // Country column should always stay visible
-          const isMatchingYear = col.field == this.state.searchValue.value;
+          const isMatchingYear =
+            col.field === this.state.searchValue.value.toString();
 
           return isCountryField || isMatchingYear;
         };
@@ -140,7 +141,7 @@ class App extends Component {
             <SearchBar
               searchValue={this.state.searchValue}
               activeType={this.state.activeType}
-              handleSelectChanged={this.handleSelectChanged}
+              handleInputChange={this.handleInputChange}
             />
             <DisplayButton handleClick={this.handleDisplay} />
           </SearchForm>
