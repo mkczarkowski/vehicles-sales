@@ -8,6 +8,8 @@ import DisplayButton from '../components/DisplayButton/DisplayButton';
 import { INPUT_TYPE } from '../shared/constants';
 import Header from '../components/Header/Header';
 
+axios.defaults.baseURL = 'http://localhost:9090';
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -27,7 +29,43 @@ class App extends Component {
       searchValue: null,
       activeType: null,
       ...this.initialState,
+      visibleRows: [],
+      availableCountries: [],
+      availableYears: [],
     };
+  }
+
+  componentDidMount() {
+    axios.get('/vehicles-sales-getAll').then(({ data: countries }) => {
+      const fetchedRows = Object.keys(countries).map(country => {
+        this.setState({
+          availableCountries: [
+            ...this.state.availableCountries,
+            { label: country, value: country },
+          ],
+        });
+        const row = { country };
+        const countryRef = countries[country];
+        const salesPerYear = Object.keys(countryRef).reduce((acc, year) => {
+          return { ...acc, [year]: countryRef[year] };
+        }, {});
+
+        return { ...row, ...salesPerYear };
+      });
+
+      this.setState({
+        rowData: fetchedRows,
+        visibleRows: fetchedRows,
+        availableYears: this.state.columnDefs.reduce(
+          (acc, col) =>
+            Number(col.field) && [
+              ...acc,
+              { value: col.field, label: col.field },
+            ],
+          [],
+        ),
+      });
+    });
   }
 
   initialState = {
@@ -91,18 +129,16 @@ class App extends Component {
   };
 
   handleDisplay = () => {
-    axios.get('/test');
-
     switch (this.state.activeType) {
       case INPUT_TYPE.INPUT_TYPE_COUNTRY: {
-        const visibleRows = this.initialState.rowData.filter(
+        const visibleRows = this.state.rowData.filter(
           row =>
             row.country.toLowerCase() ===
             this.state.searchValue.value.toLowerCase(),
         );
 
         this.setState({
-          rowData: visibleRows,
+          visibleRows,
         });
         break;
       }
@@ -126,7 +162,7 @@ class App extends Component {
       }
       default: {
         this.setState({
-          ...this.initialState,
+          visibleRows: this.state.rowData,
         });
       }
     }
@@ -142,12 +178,14 @@ class App extends Component {
               searchValue={this.state.searchValue}
               activeType={this.state.activeType}
               handleInputChange={this.handleInputChange}
+              availableCountries={this.state.availableCountries}
+              availableYears={this.state.availableYears}
             />
             <DisplayButton handleClick={this.handleDisplay} />
           </SearchForm>
           <SalesTable
             columnDefs={this.state.columnDefs}
-            rowData={this.state.rowData}
+            rowData={this.state.visibleRows}
           />
         </Container>
       </div>

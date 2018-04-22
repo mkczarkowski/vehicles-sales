@@ -15,17 +15,14 @@ class SearchBar extends Component {
       SalesRange,
     );
 
-    const { handleInputChange, activeType, searchValue } = this.props;
+    const { availableCountries, handleInputChange, activeType, searchValue, availableYears } = this.props;
 
     return (
       <div style={{ marginTop: 88 }}>
         <CountrySelect
           name="country"
           style={{ width: 228 }}
-          options={[
-            { value: 'polska', label: 'Polska' },
-            { value: 'anglia', label: 'Anglia' },
-          ]}
+          options={availableCountries}
           handleChange={newValue =>
             handleInputChange(INPUT_TYPE.INPUT_TYPE_COUNTRY, newValue)
           }
@@ -35,7 +32,7 @@ class SearchBar extends Component {
         />
         <YearSelect
           name="year"
-          options={[{ value: 2005, label: 2005 }, { value: 2006, label: 2006 }]}
+          options={availableYears}
           handleChange={newValue =>
             handleInputChange(INPUT_TYPE.INPUT_TYPE_YEAR, newValue)
           }
