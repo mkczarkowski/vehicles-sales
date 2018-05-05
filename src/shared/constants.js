@@ -6,4 +6,5 @@ export const INPUT_TYPE = Object.freeze({
   INPUT_TYPE_SALES_RANGE: 'SELECT_SALES_RANGE',
 });
 
+
 export const inputSize = 230;

@@ -1,25 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import 'rc-slider/assets/index.css';
-import Slider from 'rc-slider';
-import { inputSize } from '../../../shared/constants';
+import NumericInput from 'react-numeric-input';
 
-const { Range } = Slider;
-
-const SalesRange = ({ selectValue: searchValue, handleChange }) => (
+const SalesRange = ({ searchValue: [min, max], handleChange }) => (
   <div>
-    <Range
-      style={{ width: inputSize }}
-      allowCross={false}
-      value={searchValue}
-      onChange={handleChange}
+    <div>Min</div>
+    <NumericInput
+      onChange={valueAsNumber => handleChange([valueAsNumber, max])}
+      step={1000}
+      min={0}
+      max={100000000}
+      value={min}
+    />
+    <div>Max</div>
+    <NumericInput
+      onChange={valueAsNumber => handleChange([min, valueAsNumber])}
+      step={1000}
+      min={0}
+      max={100000000}
+      value={max}
     />
   </div>
 );
 
 SalesRange.propTypes = {
-  searchValue: PropTypes.arrayOf(PropTypes.number, PropTypes.number),
+  searchValue: PropTypes.arrayOf(PropTypes.number, PropTypes.number).isRequired,
   handleChange: PropTypes.func.isRequired,
 };
 

@@ -29,13 +29,15 @@ class App extends Component {
       searchValue: null,
       activeType: null,
       ...this.initialState,
-      visibleRows: [],
+      visibleRows: this.initialState.rowData,
       availableCountries: [],
       availableYears: [],
+      isLoading: false,
     };
   }
 
   componentDidMount() {
+    this.setState({ isLoading: true });
     axios.get('/vehicles-sales-getAll').then(({ data: countries }) => {
       const fetchedRows = Object.keys(countries).map(country => {
         this.setState({
@@ -46,14 +48,16 @@ class App extends Component {
         });
         const row = { country };
         const countryRef = countries[country];
-        const salesPerYear = Object.keys(countryRef).reduce((acc, year) => {
-          return { ...acc, [year]: countryRef[year] };
-        }, {});
+        const salesPerYear = Object.keys(countryRef).reduce(
+          (acc, year) => ({ ...acc, [year]: countryRef[year] }),
+          {},
+        );
 
         return { ...row, ...salesPerYear };
       });
 
       this.setState({
+        isLoading: false,
         rowData: fetchedRows,
         visibleRows: fetchedRows,
         availableYears: this.state.columnDefs.reduce(
@@ -157,12 +161,45 @@ class App extends Component {
 
         this.setState({
           columnDefs: visibleColumns,
+          visibleRows: this.state.rowData,
         });
+        break;
+      }
+      case INPUT_TYPE.INPUT_TYPE_SALES_RANGE: {
+        this.setState({ isLoading: true });
+        const [min, max] = this.state.searchValue;
+        axios
+          .get(`/vehicles-sales-getByRange?start=${min}&stop=${max}`)
+          .then(({ data: countries }) => {
+            const fetchedRows = Object.keys(countries).map(country => {
+              this.setState({
+                availableCountries: [
+                  ...this.state.availableCountries,
+                  { label: country, value: country },
+                ],
+              });
+              const row = { country };
+              const countryRef = countries[country];
+              const salesPerYear = Object.keys(countryRef).reduce(
+                (acc, year) => ({ ...acc, [year]: countryRef[year] }),
+                {},
+              );
+
+              return { ...row, ...salesPerYear };
+            });
+
+            this.setState({
+              isLoading: false,
+              visibleRows: fetchedRows,
+              columnDefs: this.initialState.columnDefs,
+            });
+          });
         break;
       }
       default: {
         this.setState({
           visibleRows: this.state.rowData,
+          columnDefs: this.initialState.columnDefs,
         });
       }
     }
@@ -186,6 +223,7 @@ class App extends Component {
           <SalesTable
             columnDefs={this.state.columnDefs}
             rowData={this.state.visibleRows}
+            isLoading={this.state.isLoading}
           />
         </Container>
       </div>

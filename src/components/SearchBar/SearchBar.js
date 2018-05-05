@@ -15,7 +15,13 @@ class SearchBar extends Component {
       SalesRange,
     );
 
-    const { availableCountries, handleInputChange, activeType, searchValue, availableYears } = this.props;
+    const {
+      availableCountries,
+      handleInputChange,
+      activeType,
+      searchValue,
+      availableYears,
+    } = this.props;
 
     return (
       <div style={{ marginTop: 88 }}>
@@ -54,6 +60,12 @@ class SearchBar extends Component {
 }
 
 SearchBar.propTypes = {
+  availableCountries: PropTypes.arrayOf([
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.string,
+    }),
+  ]),
   handleInputChange: PropTypes.func.isRequired,
   activeType: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   searchValue: PropTypes.oneOfType([
@@ -62,11 +74,19 @@ SearchBar.propTypes = {
       label: PropTypes.string,
     }),
     PropTypes.arrayOf([PropTypes.number, PropTypes.number]),
+  ]).isRequired,
+  availableYears: PropTypes.arrayOf([
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.string,
+    }),
   ]),
 };
 
 SearchBar.defaultProps = {
   activeType: null,
+  availableCountries: [],
+  availableYears: [],
 };
 
 export default SearchBar;

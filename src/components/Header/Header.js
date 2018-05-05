@@ -5,11 +5,8 @@ const Heading = styled.h1`
   text-align: center;
 `;
 
-const Header = props => (
-  <Heading>
-    Raport sprzedaży pojazdów w wybranych państwach na przestrzeni 2005 - 2017
-    roku
-  </Heading>
+const Header = () => (
+  <Heading>Raport sprzedaży samochodów osobowych w latach 2005 - 2017</Heading>
 );
 
 export default Header;
