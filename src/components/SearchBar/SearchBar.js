@@ -24,7 +24,7 @@ class SearchBar extends Component {
     } = this.props;
 
     return (
-      <div style={{ marginTop: 88 }}>
+      <div style={{ marginTop: 48 }}>
         <CountrySelect
           name="country"
           style={{ width: 228 }}
@@ -60,12 +60,12 @@ class SearchBar extends Component {
 }
 
 SearchBar.propTypes = {
-  availableCountries: PropTypes.arrayOf([
+  availableCountries: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       label: PropTypes.string,
     }),
-  ]),
+  ),
   handleInputChange: PropTypes.func.isRequired,
   activeType: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   searchValue: PropTypes.oneOfType([
@@ -74,17 +74,18 @@ SearchBar.propTypes = {
       label: PropTypes.string,
     }),
     PropTypes.arrayOf([PropTypes.number, PropTypes.number]),
-  ]).isRequired,
-  availableYears: PropTypes.arrayOf([
+  ]),
+  availableYears: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       label: PropTypes.string,
     }),
-  ]),
+  ),
 };
 
 SearchBar.defaultProps = {
   activeType: null,
+  searchValue: null,
   availableCountries: [],
   availableYears: [],
 };

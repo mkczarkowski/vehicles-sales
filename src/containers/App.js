@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import Spinner from 'react-spinkit';
 
 import SearchBar from '../components/SearchBar/SearchBar';
 import SalesTable from '../components/SalesTable/SalesTable';
 import DisplayButton from '../components/DisplayButton/DisplayButton';
 import { INPUT_TYPE } from '../shared/constants';
 import Header from '../components/Header/Header';
+import SalesChart from '../components/SalesChart/SalesChart';
 
 axios.defaults.baseURL = 'http://localhost:9090';
 
@@ -20,6 +22,12 @@ const SearchForm = styled.div`
   flex-direction: column;
   margin-left: 75px;
   margin-right: 75px;
+`;
+
+const SpinnerContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 class App extends Component {
@@ -159,9 +167,23 @@ class App extends Component {
           matchColumns,
         );
 
+        const visibleRows = this.state.rowData.map((countrySales, idx) => {
+          return Object.keys(countrySales).reduce((acc, key) => {
+            const isCountryField = key === 'country'; // Country should always stay visible
+            const isMatchingYear =
+              key === this.state.searchValue.value.toString();
+
+            if (isCountryField || isMatchingYear) {
+              return { ...acc, [key]: this.state.rowData[idx][key] };
+            }
+
+            return acc;
+          }, {});
+        });
+
         this.setState({
           columnDefs: visibleColumns,
-          visibleRows: this.state.rowData,
+          visibleRows,
         });
         break;
       }
@@ -220,11 +242,31 @@ class App extends Component {
             />
             <DisplayButton handleClick={this.handleDisplay} />
           </SearchForm>
-          <SalesTable
-            columnDefs={this.state.columnDefs}
-            rowData={this.state.visibleRows}
-            isLoading={this.state.isLoading}
-          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+            }}
+          >
+            {this.state.isLoading ? (
+              <SpinnerContainer>
+                <Spinner
+                  style={{ margin: '66px auto' }}
+                  name="pacman"
+                  color="gray"
+                />
+              </SpinnerContainer>
+            ) : (
+              <div>
+                <SalesTable
+                  columnDefs={this.state.columnDefs}
+                  rowData={this.state.visibleRows}
+                />
+                <SalesChart data={this.state.visibleRows} />
+              </div>
+            )}
+          </div>
         </Container>
       </div>
     );
