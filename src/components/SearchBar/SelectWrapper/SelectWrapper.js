@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-import { inputSize } from '../../../shared/constants';
+import { INPUT_WIDTH } from '../../../shared/constants';
 
 const SelectWrapper = ({ name, options, handleChange, searchValue }) => (
   <div>
     <Select
-      style={{ width: inputSize }}
+      style={{ width: INPUT_WIDTH }}
       name={name}
       placeholder="Wybierz..."
       options={options}

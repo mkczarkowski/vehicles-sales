@@ -88,6 +88,7 @@ module.exports = {
     // https://github.com/prettier/eslint-plugin-prettier
     'prettier/prettier': 'error',
     'linebreak-style': 0,
+    'no-use-before-define': ['error', { functions: false }],
   },
 
   settings: {

@@ -6,9 +6,10 @@ import Spinner from 'react-spinkit';
 import SearchBar from '../components/SearchBar/SearchBar';
 import SalesTable from '../components/SalesTable/SalesTable';
 import DisplayButton from '../components/DisplayButton/DisplayButton';
-import { INPUT_TYPE } from '../shared/constants';
+import { COLUMN_DEFS, AVAILABLE_YEARS, INPUT_TYPE } from '../shared/constants';
 import Header from '../components/Header/Header';
 import SalesChart from '../components/SalesChart/SalesChart';
+import { mapKeysAsSelectOptions } from '../shared/libs/mapKeysAsSelectOptions';
 
 axios.defaults.baseURL = 'http://localhost:9090';
 
@@ -31,107 +32,43 @@ const SpinnerContainer = styled.div`
 `;
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      searchValue: null,
-      activeType: null,
-      ...this.initialState,
-      visibleRows: this.initialState.rowData,
-      availableCountries: [],
-      availableYears: [],
-      isLoading: false,
-    };
-  }
+  state = {
+    searchValue: null,
+    activeType: null,
+    rowData: [],
+    visibleColumns: COLUMN_DEFS,
+    visibleRows: [],
+    availableCountries: [],
+    isLoading: true,
+  };
 
   componentDidMount() {
-    this.setState({ isLoading: true });
     axios.get('/vehicles-sales-getAll').then(({ data: countries }) => {
-      const fetchedRows = Object.keys(countries).map(country => {
-        this.setState({
-          availableCountries: [
-            ...this.state.availableCountries,
-            { label: country, value: country },
-          ],
-        });
-        const row = { country };
-        const countryRef = countries[country];
-        const salesPerYear = Object.keys(countryRef).reduce(
-          (acc, year) => ({ ...acc, [year]: countryRef[year] }),
-          {},
-        );
-
-        return { ...row, ...salesPerYear };
-      });
+      const salesPerYearForEachCountry = calculateSalesPerYearForEachCountry(
+        countries,
+      );
 
       this.setState({
         isLoading: false,
-        rowData: fetchedRows,
-        visibleRows: fetchedRows,
-        availableYears: this.state.columnDefs.reduce(
-          (acc, col) =>
-            Number(col.field) && [
-              ...acc,
-              { value: col.field, label: col.field },
-            ],
-          [],
-        ),
+        rowData: salesPerYearForEachCountry,
+        visibleRows: salesPerYearForEachCountry,
+        availableCountries: mapKeysAsSelectOptions(countries),
       });
+
+      function calculateSalesPerYearForEachCountry(countries) {
+        return Object.keys(countries).map(country => {
+          const row = { country };
+          const countryRef = countries[country];
+          const salesPerYear = Object.keys(countryRef).reduce(
+            (acc, year) => ({ ...acc, [year]: countryRef[year] }),
+            {},
+          );
+
+          return { ...row, ...salesPerYear };
+        });
+      }
     });
   }
-
-  initialState = {
-    columnDefs: [
-      { headerName: 'Kraj/Region', field: 'country', minWidth: 130 },
-      { headerName: '2005', field: '2005', minWidth: 70 },
-      { headerName: '2006', field: '2006', minWidth: 70 },
-      { headerName: '2007', field: '2007', minWidth: 70 },
-      { headerName: '2008', field: '2008', minWidth: 70 },
-      { headerName: '2009', field: '2009', minWidth: 70 },
-      { headerName: '2010', field: '2010', minWidth: 70 },
-      { headerName: '2011', field: '2011', minWidth: 70 },
-      { headerName: '2012', field: '2012', minWidth: 70 },
-      { headerName: '2013', field: '2013', minWidth: 70 },
-      { headerName: '2014', field: '2014', minWidth: 70 },
-      { headerName: '2015', field: '2015', minWidth: 70 },
-      { headerName: '2016', field: '2016', minWidth: 70 },
-      { headerName: '2017', field: '2017', minWidth: 70 },
-    ],
-    rowData: [
-      {
-        country: 'Polska',
-        2005: '307',
-        2006: '307',
-        2007: '307',
-        2008: '307',
-        2009: '307',
-        2010: '307',
-        2011: '307',
-        2012: '307',
-        2013: '307',
-        2014: '307',
-        2015: '307',
-        2016: '307',
-        2017: '307',
-      },
-      {
-        country: 'Anglia',
-        2005: '307',
-        2006: '307',
-        2007: '307',
-        2008: '307',
-        2009: '307',
-        2010: '307',
-        2011: '307',
-        2012: '307',
-        2013: '307',
-        2014: '307',
-        2015: '307',
-        2016: '307',
-        2017: '307',
-      },
-    ],
-  };
 
   handleInputChange = (selectType, newValue) => {
     this.setState({
@@ -163,9 +100,7 @@ class App extends Component {
           return isCountryField || isMatchingYear;
         };
 
-        const visibleColumns = this.initialState.columnDefs.filter(
-          matchColumns,
-        );
+        const visibleColumns = COLUMN_DEFS.filter(matchColumns);
 
         const visibleRows = this.state.rowData.map((countrySales, idx) => {
           return Object.keys(countrySales).reduce((acc, key) => {
@@ -213,7 +148,7 @@ class App extends Component {
             this.setState({
               isLoading: false,
               visibleRows: fetchedRows,
-              columnDefs: this.initialState.columnDefs,
+              visibleColumns: COLUMN_DEFS,
             });
           });
         break;
@@ -221,7 +156,7 @@ class App extends Component {
       default: {
         this.setState({
           visibleRows: this.state.rowData,
-          columnDefs: this.initialState.columnDefs,
+          visibleColumns: COLUMN_DEFS,
         });
       }
     }
@@ -238,7 +173,7 @@ class App extends Component {
               activeType={this.state.activeType}
               handleInputChange={this.handleInputChange}
               availableCountries={this.state.availableCountries}
-              availableYears={this.state.availableYears}
+              availableYears={AVAILABLE_YEARS}
             />
             <DisplayButton handleClick={this.handleDisplay} />
           </SearchForm>
@@ -260,7 +195,7 @@ class App extends Component {
             ) : (
               <div>
                 <SalesTable
-                  columnDefs={this.state.columnDefs}
+                  columnDefs={this.state.visibleColumns}
                   rowData={this.state.visibleRows}
                 />
                 <SalesChart data={this.state.visibleRows} />
