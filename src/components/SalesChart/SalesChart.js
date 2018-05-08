@@ -12,10 +12,11 @@ import {
 } from 'recharts';
 import randomMC from 'random-material-color';
 import union from 'lodash.union';
+import isEqual from 'lodash.isequal';
 
 class SalesChart extends React.Component {
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.data.length > 0 && nextProps.data !== prevState.data) {
+  static getDerivedStateFromProps(nextProps) {
+    if (nextProps.data.length > 0) {
       const getYearKeys = (acc, key) => {
         const numericalKey = Number(key);
         if (Number.isFinite(numericalKey)) {
@@ -42,6 +43,10 @@ class SalesChart extends React.Component {
   state = {
     barKeys: [],
   };
+
+  shouldComponentUpdate(nextProps) {
+    return !isEqual(this.props.data, nextProps.data);
+  }
 
   render() {
     const bars = this.state.barKeys.map(key => (
