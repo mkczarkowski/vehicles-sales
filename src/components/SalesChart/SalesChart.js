@@ -11,6 +11,7 @@ import {
   Legend,
 } from 'recharts';
 import randomMC from 'random-material-color';
+import union from 'lodash.union';
 
 class SalesChart extends React.Component {
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -18,14 +19,21 @@ class SalesChart extends React.Component {
       const getYearKeys = (acc, key) => {
         const numericalKey = Number(key);
         if (Number.isFinite(numericalKey)) {
-          return [...acc, key];
+          return [...acc, numericalKey];
         }
 
         return acc;
       };
-      const barKeys = Object.keys(nextProps.data[0]).reduce(getYearKeys, []);
 
-      return { barKeys };
+      let visibleYears = [];
+      nextProps.data.forEach(countrySales => {
+        visibleYears = union(
+          visibleYears,
+          Object.keys(countrySales).reduce(getYearKeys, []),
+        );
+      });
+
+      return { barKeys: visibleYears };
     }
 
     return null;
