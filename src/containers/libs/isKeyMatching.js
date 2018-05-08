@@ -7,4 +7,4 @@
  * @param {object} object - object containing given key
  */
 export const isKeyMatching = key => val => obj =>
-  obj[key].toLowerCase() === val.toLowerCase();
+  String(obj[key]).toLowerCase() === String(val).toLowerCase();

@@ -117,18 +117,10 @@ class App extends Component {
           );
 
           function reduceRowDataToSelectedYearAndCountryName(acc, key) {
-            const isCountrySalesKeyMatching = isKeyMatching(key);
-            const isCountrySalesKeyMatchingCountry = isCountrySalesKeyMatching(
-              'country',
-            );
-            const isCountrySalesKeyMatchingSelectedYear = isCountrySalesKeyMatching(
-              selectedValue,
-            );
+            const isKeyMatchingCountry = key === 'country';
+            const isKeyMatchingSelectedYear = key === selectedValue;
 
-            if (
-              isCountrySalesKeyMatchingCountry ||
-              isCountrySalesKeyMatchingSelectedYear
-            ) {
+            if (isKeyMatchingCountry || isKeyMatchingSelectedYear) {
               return { ...acc, [key]: this.state.rowData[idx][key] };
             }
 
