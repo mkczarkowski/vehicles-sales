@@ -72,95 +72,107 @@ class App extends Component {
   }
 
   handleInputChange = (selectType, newValue) => {
-    this.setState({
-      activeType: newValue && selectType, // Determine if newValue is not null, if so, set new activeType
-      selectedValue: newValue,
-    });
+    if (
+      this.state.activeType !== selectType ||
+      this.state.selectedValue !== newValue
+    ) {
+      this.setState({
+        activeType: newValue && selectType, // Determine if newValue is not null, if so, set new activeType
+        selectedValue: newValue,
+      });
+    }
   };
 
   handleDisplayClick = () => {
     this.setState({ isLoading: true });
-    const selectedValue = this.state.selectedValue.value;
     switch (this.state.activeType) {
       case INPUT_TYPE.INPUT_TYPE_COUNTRY: {
-        const isCountryMatching = isKeyMatching('country');
-        const isCountryMatchingSelectedCountry = isCountryMatching(
-          selectedValue,
-        );
-        const visibleRows = this.state.rowData.filter(
-          isCountryMatchingSelectedCountry,
-        );
-
-        this.setState({
-          visibleRows,
-          visibleColumns: COLUMN_DEFS,
-          isLoading: false,
-        });
-
+        this.setVisibleRowsAndColumnsByCountry();
         break;
       }
       case INPUT_TYPE.INPUT_TYPE_YEAR: {
-        const isFieldMatching = isKeyMatching('field');
-        const isFieldMatchingCountry = isFieldMatching('country');
-        const isFieldMatchingSelectedYear = isFieldMatching(selectedValue);
-
-        const countryNames = COLUMN_DEFS.filter(isFieldMatchingCountry);
-        const visibleColumns = [
-          ...countryNames,
-          ...COLUMN_DEFS.filter(isFieldMatchingSelectedYear),
-        ];
-
-        const visibleRows = this.state.rowData.map((countrySales, idx) => {
-          return Object.keys(countrySales).reduce(
-            reduceRowDataToSelectedYearAndCountryName.bind(this),
-            {},
-          );
-
-          function reduceRowDataToSelectedYearAndCountryName(acc, key) {
-            const isKeyMatchingCountry = key === 'country';
-            const isKeyMatchingSelectedYear = key === selectedValue;
-
-            if (isKeyMatchingCountry || isKeyMatchingSelectedYear) {
-              return { ...acc, [key]: this.state.rowData[idx][key] };
-            }
-
-            return acc;
-          }
-        });
-
-        this.setState({
-          visibleColumns,
-          visibleRows,
-          isLoading: false,
-        });
+        this.setVisibleRowsAndColumnsByYear();
         break;
       }
       case INPUT_TYPE.INPUT_TYPE_SALES_RANGE: {
-        const [min, max] = this.state.selectedValue;
-        axios
-          .get(`/vehicles-sales-getByRange?start=${min}&stop=${max}`)
-          .then(({ data: countries }) => {
-            const fetchedRows = Object.keys(countries).map(country => {
-              const countrySales = countries[country];
-              return { country, ...countrySales };
-            });
-
-            this.setState({
-              visibleRows: fetchedRows,
-              visibleColumns: COLUMN_DEFS,
-              isLoading: false,
-            });
-          });
+        this.setVisibleRowsAndColumnsBySalesRange();
         break;
       }
       default: {
         this.setState({
           visibleRows: this.state.rowData,
           visibleColumns: COLUMN_DEFS,
-          isLoading: false,
         });
       }
     }
+    this.setState({isLoading: false});
+  };
+
+  setVisibleRowsAndColumnsByCountry = () => {
+    const selectedValue = this.state.selectedValue.value;
+    const isCountryMatching = isKeyMatching('country');
+    const isCountryMatchingSelectedCountry = isCountryMatching(selectedValue);
+    const visibleRows = this.state.rowData.filter(
+      isCountryMatchingSelectedCountry,
+    );
+
+    this.setState({
+      visibleRows,
+      visibleColumns: COLUMN_DEFS,
+    });
+  };
+
+  setVisibleRowsAndColumnsByYear = () => {
+    const selectedValue = this.state.selectedValue.value;
+    const isFieldMatching = isKeyMatching('field');
+    const isFieldMatchingCountry = isFieldMatching('country');
+    const isFieldMatchingSelectedYear = isFieldMatching(selectedValue);
+
+    const countryNames = COLUMN_DEFS.filter(isFieldMatchingCountry);
+    const visibleColumns = [
+      ...countryNames,
+      ...COLUMN_DEFS.filter(isFieldMatchingSelectedYear),
+    ];
+
+    const visibleRows = this.state.rowData.map((countrySales, idx) => {
+      return Object.keys(countrySales).reduce(
+        reduceRowDataToSelectedYearAndCountryName.bind(this),
+        {},
+      );
+
+      function reduceRowDataToSelectedYearAndCountryName(acc, key) {
+        const isKeyMatchingCountry = key === 'country';
+        const isKeyMatchingSelectedYear = key === selectedValue;
+
+        if (isKeyMatchingCountry || isKeyMatchingSelectedYear) {
+          return { ...acc, [key]: this.state.rowData[idx][key] };
+        }
+
+        return acc;
+      }
+    });
+
+    this.setState({
+      visibleColumns,
+      visibleRows,
+    });
+  };
+
+  setVisibleRowsAndColumnsBySalesRange = () => {
+    const [min, max] = this.state.selectedValue;
+    axios
+      .get(`/vehicles-sales-getByRange?start=${min}&stop=${max}`)
+      .then(({ data: countries }) => {
+        const fetchedRows = Object.keys(countries).map(country => {
+          const countrySales = countries[country];
+          return { country, ...countrySales };
+        });
+
+        this.setState({
+          visibleRows: fetchedRows,
+          visibleColumns: COLUMN_DEFS,
+        });
+      });
   };
 
   render() {
