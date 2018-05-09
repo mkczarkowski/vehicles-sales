@@ -17,15 +17,6 @@ import isEqual from 'lodash.isequal';
 class SalesChart extends React.Component {
   static getDerivedStateFromProps(nextProps) {
     if (nextProps.data.length > 0) {
-      const getYearKeys = (acc, key) => {
-        const numericalKey = Number(key);
-        if (Number.isFinite(numericalKey)) {
-          return [...acc, numericalKey];
-        }
-
-        return acc;
-      };
-
       let visibleYears = [];
       nextProps.data.forEach(countrySales => {
         visibleYears = union(
@@ -38,6 +29,15 @@ class SalesChart extends React.Component {
     }
 
     return null;
+
+    function getYearKeys(acc, key) {
+      const numericalKey = Number(key);
+      if (Number.isFinite(numericalKey)) {
+        return [...acc, numericalKey];
+      }
+
+      return acc;
+    }
   }
 
   state = {
