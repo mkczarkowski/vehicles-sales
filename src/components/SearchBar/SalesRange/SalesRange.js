@@ -1,31 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-import NumericInput from 'react-numeric-input';
+import 'antd/dist/antd.css';
+import { InputNumber } from 'antd';
+import { INPUT_WIDTH } from "../../../shared/constants";
 
-const SalesRange = ({ searchValue: [min, max], handleChange }) => (
-  <div>
-    <div>Min</div>
-    <NumericInput
-      onChange={valueAsNumber => handleChange([valueAsNumber, max])}
-      step={1000}
-      min={0}
-      max={100000000}
-      value={min}
-    />
-    <div>Max</div>
-    <NumericInput
-      onChange={valueAsNumber => handleChange([min, valueAsNumber])}
-      step={1000}
-      min={0}
-      max={100000000}
-      value={max}
-    />
-  </div>
-);
+const Heading = styled.h3`
+  margin-top: 18px;
+  margin-bottom: 18px;
+`;
+
+
+class SalesRange extends React.Component {
+  render() {
+    const {
+      selectedValue: [min, max],
+      handleChange,
+    } = this.props;
+
+    return (
+      <div>
+        <Heading>Ilość sprzedanych sztuk</Heading>
+        <div>Min</div>
+        <InputNumber
+          onChange={valueAsNumber => {
+            handleChange([valueAsNumber, max]);
+          }}
+          step={1000}
+          min={0}
+          max={100000000}
+          value={min}
+          ref={input => (this.minInput = input)}
+          style={{ width: INPUT_WIDTH }}
+        />
+        <div>Max</div>
+        <InputNumber
+          onChange={valueAsNumber => {
+            handleChange([min, valueAsNumber]);
+          }}
+          step={1000}
+          min={min}
+          max={100000000}
+          value={max}
+          ref={input => (this.maxInput = input)}
+          style={{ width: INPUT_WIDTH }}
+        />
+      </div>
+    );
+  }
+}
 
 SalesRange.propTypes = {
-  searchValue: PropTypes.arrayOf(PropTypes.number, PropTypes.number).isRequired,
+  selectedValue: PropTypes.arrayOf(PropTypes.number, PropTypes.number)
+    .isRequired,
   handleChange: PropTypes.func.isRequired,
 };
 

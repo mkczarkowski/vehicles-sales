@@ -10,16 +10,12 @@ class SearchBar extends Component {
   render() {
     const CountrySelect = withHeading('Kraj/Region', SelectWrapper);
     const YearSelect = withHeading('Rok', SelectWrapper);
-    const SalesRangeWithHeading = withHeading(
-      'Ilość sprzedanych aut',
-      SalesRange,
-    );
 
     const {
       availableCountries,
       handleInputChange,
       activeType,
-      searchValue,
+      selectedValue,
       availableYears,
     } = this.props;
 
@@ -32,8 +28,8 @@ class SearchBar extends Component {
           handleChange={newValue =>
             handleInputChange(INPUT_TYPE.INPUT_TYPE_COUNTRY, newValue)
           }
-          searchValue={
-            activeType === INPUT_TYPE.INPUT_TYPE_COUNTRY && searchValue
+          selectedValue={
+            activeType === INPUT_TYPE.INPUT_TYPE_COUNTRY && selectedValue
           }
         />
         <YearSelect
@@ -42,17 +38,18 @@ class SearchBar extends Component {
           handleChange={newValue =>
             handleInputChange(INPUT_TYPE.INPUT_TYPE_YEAR, newValue)
           }
-          searchValue={activeType === INPUT_TYPE.INPUT_TYPE_YEAR && searchValue}
+          selectedValue={activeType === INPUT_TYPE.INPUT_TYPE_YEAR && selectedValue}
         />
-        <SalesRangeWithHeading
-          handleChange={newValue =>
+        <SalesRange
+            handleChange={newValue =>
             handleInputChange(INPUT_TYPE.INPUT_TYPE_SALES_RANGE, newValue)
           }
-          searchValue={
+            selectedValue={
             activeType === INPUT_TYPE.INPUT_TYPE_SALES_RANGE
-              ? searchValue
+              ? selectedValue
               : [0, 0]
           }
+            ref={salesRange => (this.salesRange = salesRange)}
         />
       </div>
     );
@@ -68,7 +65,7 @@ SearchBar.propTypes = {
   ),
   handleInputChange: PropTypes.func.isRequired,
   activeType: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-  searchValue: PropTypes.oneOfType([
+  selectedValue: PropTypes.oneOfType([
     PropTypes.shape({
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       label: PropTypes.string,
@@ -85,7 +82,6 @@ SearchBar.propTypes = {
 
 SearchBar.defaultProps = {
   activeType: null,
-  searchValue: null,
   availableCountries: [],
   availableYears: [],
 };

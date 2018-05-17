@@ -10,11 +10,7 @@ const AgGridContainer = styled.div`
   margin-top: 66px;
   margin-right: 75px;
   box-sizing: border-box;
-  height: 100%;
   min-height: 300px !important;
-  width: 100%;
-  max-width: 1450px;
-  overflow: hidden;
 `;
 
 class SalesTable extends Component {

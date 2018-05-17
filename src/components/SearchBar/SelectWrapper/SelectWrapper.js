@@ -5,7 +5,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import { INPUT_WIDTH } from '../../../shared/constants';
 
-const SelectWrapper = ({ name, options, handleChange, searchValue }) => (
+const SelectWrapper = ({ name, options, handleChange, selectedValue }) => (
   <div>
     <Select
       style={{ width: INPUT_WIDTH }}
@@ -13,7 +13,7 @@ const SelectWrapper = ({ name, options, handleChange, searchValue }) => (
       placeholder="Wybierz..."
       options={options}
       onChange={handleChange}
-      value={searchValue}
+      value={selectedValue}
     />
   </div>
 );

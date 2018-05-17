@@ -44,6 +44,9 @@ class App extends Component {
   };
 
   componentDidMount() {
+    /**
+     * Synchronize state with API
+     */
     axios.get('/vehicles-sales-getAll').then(({ data: countries }) => {
       const salesPerYearForEachCountry = calculateSalesPerYearForEachCountry(
         countries,
@@ -71,108 +74,120 @@ class App extends Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.activeType ===  INPUT_TYPE.INPUT_TYPE_SALES_RANGE) {
+       /**
+        * Refocus min/max sales range input after selectedValue has changed
+        */
+      if (prevState.selectedValue[0] !== this.state.selectedValue[0]) {
+        this.searchBar.salesRange.minInput.focus();
+      } else {
+        this.searchBar.salesRange.maxInput.focus();
+      }
+    }
+  }
+
   handleInputChange = (selectType, newValue) => {
-    if (
-      this.state.activeType !== selectType ||
-      this.state.selectedValue !== newValue
-    ) {
-      this.setState({
+    this.setState(
+      {
         activeType: newValue && selectType, // Determine if newValue is not null, if so, set new activeType
         selectedValue: newValue,
-      });
-    }
+      },
+    );
   };
 
   handleDisplayClick = () => {
     this.setState({ isLoading: true });
+    const selectedValue = this.state.selectedValue.value;
     switch (this.state.activeType) {
       case INPUT_TYPE.INPUT_TYPE_COUNTRY: {
-        this.setVisibleRowsAndColumnsByCountry();
+        /**
+         * Filter data to display only sales of selected country
+         */
+        const isCountryMatching = isKeyMatching('country');
+        const isCountryMatchingSelectedCountry = isCountryMatching(
+          selectedValue,
+        );
+        const visibleRows = this.state.rowData.filter(
+          isCountryMatchingSelectedCountry,
+        );
+
+        this.setState({
+          visibleRows,
+          visibleColumns: COLUMN_DEFS,
+          isLoading: false,
+        });
+
         break;
       }
       case INPUT_TYPE.INPUT_TYPE_YEAR: {
-        this.setVisibleRowsAndColumnsByYear();
+        /**
+         * Filter data to display sales of each country in selected year
+         */
+        const isFieldMatching = isKeyMatching('field');
+        const isFieldMatchingCountry = isFieldMatching('country');
+        const isFieldMatchingSelectedYear = isFieldMatching(selectedValue);
+
+        const countryNames = COLUMN_DEFS.filter(isFieldMatchingCountry);
+        const visibleColumns = [
+          ...countryNames,
+          ...COLUMN_DEFS.filter(isFieldMatchingSelectedYear),
+        ];
+
+        const visibleRows = this.state.rowData.map((countrySales, idx) => {
+          return Object.keys(countrySales).reduce(
+            reduceRowDataToSelectedYearAndCountryName.bind(this),
+            {},
+          );
+
+          function reduceRowDataToSelectedYearAndCountryName(acc, key) {
+            const isKeyMatchingCountry = key === 'country';
+            const isKeyMatchingSelectedYear = key === selectedValue;
+
+            if (isKeyMatchingCountry || isKeyMatchingSelectedYear) {
+              return { ...acc, [key]: this.state.rowData[idx][key] };
+            }
+
+            return acc;
+          }
+        });
+
+        this.setState({
+          visibleColumns,
+          visibleRows,
+          isLoading: false,
+        });
         break;
       }
       case INPUT_TYPE.INPUT_TYPE_SALES_RANGE: {
-        this.setVisibleRowsAndColumnsBySalesRange();
+        /**
+         * Filter data that match selected sales count range
+         */
+        const [min, max] = this.state.selectedValue;
+        axios
+          .get(`/vehicles-sales-getByRange?start=${min}&stop=${max}`)
+          .then(({ data: countries }) => {
+            const fetchedRows = Object.keys(countries).map(country => {
+              const countrySales = countries[country];
+              return { country, ...countrySales };
+            });
+
+            this.setState({
+              visibleRows: fetchedRows,
+              visibleColumns: COLUMN_DEFS,
+              isLoading: false,
+            });
+          });
         break;
       }
       default: {
         this.setState({
           visibleRows: this.state.rowData,
           visibleColumns: COLUMN_DEFS,
+          isLoading: false,
         });
       }
     }
-    this.setState({isLoading: false});
-  };
-
-  setVisibleRowsAndColumnsByCountry = () => {
-    const selectedValue = this.state.selectedValue.value;
-    const isCountryMatching = isKeyMatching('country');
-    const isCountryMatchingSelectedCountry = isCountryMatching(selectedValue);
-    const visibleRows = this.state.rowData.filter(
-      isCountryMatchingSelectedCountry,
-    );
-
-    this.setState({
-      visibleRows,
-      visibleColumns: COLUMN_DEFS,
-    });
-  };
-
-  setVisibleRowsAndColumnsByYear = () => {
-    const selectedValue = this.state.selectedValue.value;
-    const isFieldMatching = isKeyMatching('field');
-    const isFieldMatchingCountry = isFieldMatching('country');
-    const isFieldMatchingSelectedYear = isFieldMatching(selectedValue);
-
-    const countryNames = COLUMN_DEFS.filter(isFieldMatchingCountry);
-    const visibleColumns = [
-      ...countryNames,
-      ...COLUMN_DEFS.filter(isFieldMatchingSelectedYear),
-    ];
-
-    const visibleRows = this.state.rowData.map((countrySales, idx) => {
-      return Object.keys(countrySales).reduce(
-        reduceRowDataToSelectedYearAndCountryName.bind(this),
-        {},
-      );
-
-      function reduceRowDataToSelectedYearAndCountryName(acc, key) {
-        const isKeyMatchingCountry = key === 'country';
-        const isKeyMatchingSelectedYear = key === selectedValue;
-
-        if (isKeyMatchingCountry || isKeyMatchingSelectedYear) {
-          return { ...acc, [key]: this.state.rowData[idx][key] };
-        }
-
-        return acc;
-      }
-    });
-
-    this.setState({
-      visibleColumns,
-      visibleRows,
-    });
-  };
-
-  setVisibleRowsAndColumnsBySalesRange = () => {
-    const [min, max] = this.state.selectedValue;
-    axios
-      .get(`/vehicles-sales-getByRange?start=${min}&stop=${max}`)
-      .then(({ data: countries }) => {
-        const fetchedRows = Object.keys(countries).map(country => {
-          const countrySales = countries[country];
-          return { country, ...countrySales };
-        });
-
-        this.setState({
-          visibleRows: fetchedRows,
-          visibleColumns: COLUMN_DEFS,
-        });
-      });
   };
 
   render() {
@@ -182,18 +197,17 @@ class App extends Component {
         <Container>
           <SearchForm>
             <SearchBar
-              searchValue={this.state.selectedValue}
+              selectedValue={this.state.selectedValue}
               activeType={this.state.activeType}
               handleInputChange={this.handleInputChange}
               availableCountries={this.state.availableCountries}
               availableYears={AVAILABLE_YEARS}
+              ref={searchBar => (this.searchBar = searchBar)}
             />
             <DisplayButton handleClick={this.handleDisplayClick} />
           </SearchForm>
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
               width: '100%',
             }}
           >
@@ -206,11 +220,15 @@ class App extends Component {
                 />
               </SpinnerContainer>
             ) : (
-              <div>
-                <SalesTable
-                  columnDefs={this.state.visibleColumns}
-                  rowData={this.state.visibleRows}
-                />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <div style={{ overflow: 'hidden', flexGrow: '1' }}>
+                    <SalesTable
+                      columnDefs={this.state.visibleColumns}
+                      rowData={this.state.visibleRows}
+                    />
+                  </div>
+                </div>
                 <SalesChart data={this.state.visibleRows} />
               </div>
             )}
