@@ -17,9 +17,7 @@ class SalesTable extends Component {
   onGridReady = params => {
     params.api.sizeColumnsToFit();
     window.addEventListener('resize', () => {
-      setTimeout(() => {
-        params.api.sizeColumnsToFit();
-      });
+      params.api.sizeColumnsToFit();
     });
   };
 
